@@ -1,11 +1,28 @@
+from sklearn import metrics
 from sklearn import datasets
 import numpy
-
 
 #read data from local file
 def load_data():
 
     return
+
+#determine the number of clusters in a dataset using silhouette method
+def number_of_clusters(dataset):
+    max_silhouette_value = -1; #the minimum value for silhouette coefficient
+    best_k = 1;
+    #for each k value, calculate silhouette value, choose the maximum silhouette and respective k
+    for i in range(2,5):
+        centroids, label = kmeans(dataset, i)
+        temp_silhouette_value = metrics.silhouette_score(dataset, label)
+        print("silhouette coefficient for k = ", i,  " is ", temp_silhouette_value)
+        if temp_silhouette_value > max_silhouette_value:
+            best_k = i
+            max_silhouette_value = temp_silhouette_value
+    print ("best_k is :")
+    print (best_k)
+    return best_k;
+
 
 #k means clustering
 def kmeans(dataset, k):
@@ -17,15 +34,12 @@ def kmeans(dataset, k):
         for i in range(n):
             min_value = numpy.min(dataset[:,i])
             max_value = numpy.max(dataset[:,i])
-
             centroids[:,i] = min_value + (max_value - min_value)* numpy.random.rand(k)
         return centroids
-
 
     #step1:initial k points randomly
     centroids = __rand_centroids__(dataset, k)
     converged = False #indicate if cluster converged, does it have to be equal? or less than 0.00001?
-
     num_of_entries = dataset.shape[0] #number of data point
     label = numpy.zeros(num_of_entries) #use to store the nearest centroid for each entry data, set all to zero
 
@@ -49,10 +63,31 @@ def kmeans(dataset, k):
             centroids[l] = numpy.mean(dataset[label == l])
         #check if centroids change
         converged = True if (prev_centroids == centroids).all() else False
+        print("centorids for k = ", k)
         print(centroids)
-
+        print("\n\n")
+        
     return centroids, label
 
+
+#test case
 iris = datasets.load_iris()
 dataset = iris.data
-kmeans(dataset, 3)
+#print (iris)
+#kmeans(dataset, 4)
+number_of_clusters(dataset)
+
+"""
+todo list:
+Jian:
+read iris dataset
+solve nan problem
+??best k = 2
+
+Brian:
+read mushroom dataset
+plot data
+
+
+??formulate ideas, document process and results
+"""
