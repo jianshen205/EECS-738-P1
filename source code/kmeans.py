@@ -2,6 +2,25 @@ from sklearn import metrics
 from sklearn import datasets
 import numpy
 
+#read mushroom data from local
+def load_mushroom(file_name):
+    file = open(file_name)
+    rows = file.read().splitlines() #split the lines at line boundaries returns a list of lines
+    file.close()
+    dataset = []
+
+    #for each data row, create a new list to store 23 features
+    for i in range(1,len(rows)): # skip first row(name of features)
+        col = rows[i].split(',') # create a list of strings after breaking the given string by ','
+        item_features = [] #one list for each item
+        # for each column
+        for j in range(0, len(col)):
+            val = float(ord(col[j])); #convert values to float, make sure types are not flexible
+            item_features.append(val); #add feature value to item list
+        dataset.append(item_features)
+
+    dataset = numpy.array(dataset) #conversion from 2d list to 2d array
+    return dataset;
 
 
 #read iris data from local
@@ -109,6 +128,11 @@ def kmeans(dataset, k):
 iris = load_iris("Iris.csv")
 print(iris)
 number_of_clusters(iris)
+
+#test case
+mushroom = load_mushroom("mushrooms.csv")
+print(mushroom)
+number_of_clusters(mushroom)
 
 """
 todo list:
