@@ -1,6 +1,8 @@
 from sklearn import metrics
 from sklearn import datasets
 import numpy
+from random import choice
+from matplotlib import pyplot
 
 #read mushroom data from local
 def load_mushroom(file_name):
@@ -120,19 +122,67 @@ def kmeans(dataset, k):
         converged = True if (prev_centroids == centroids).all() else False  #check if centroids change
         print("centroids for k = ", k, centroids, "\n\n\n")
 
-
+    PlotClusters(dataset, label);
     return centroids, label
+
+def CutToTwoFeatures(itemsA, itemsB):
+    n = 3;
+    # n = len(items);
+    X = [];
+    for i in range(n):
+        itemA = itemsA[i];
+        itemB = itemsB[i];
+        newItem = [itemA, itemB];
+        X.append(newItem);
+
+    print ("X VALUE/AKA CUT: ", X);
+    return X;
+
+def PlotClusters(dataset, label):
+    cut = CutToTwoFeatures(dataset[label == 0], dataset[label == 1]);
+    n = len(dataset);
+    X = [[] for i in range(n)];
+    print("X FIRST: ", X);
+
+    print("CLUSTERS: ", dataset);
+
+    for i in range(n):
+        data = dataset[i];
+        for item in data:
+                X[i].append(item);
+
+    colors = ['r','b','g','c','m','y'];
+
+    for x in X:
+        print("x: ", x);
+        print ("X: ", X);
+        print ("item: ", item);
+        c = choice(colors);
+        colors.remove(c);
+        Xa = [];
+        Xb = [];
+
+        for item in x:
+            Xa.append(x[0]);
+            Xb.append(x[1]);
+
+        pyplot.plot(Xa,Xb,'o', color=c);
+
+    pyplot.show();
 
 
 #test case
 iris = load_iris("Iris.csv")
 print(iris)
 number_of_clusters(iris)
+# PlotClusters(centroids);
 
 #test case
-mushroom = load_mushroom("mushrooms.csv")
-print(mushroom)
-number_of_clusters(mushroom)
+# mushroom = load_mushroom("mushrooms.csv")
+# print(mushroom)
+# number_of_clusters(mushroom)
+# PlotClusters(mushroom);
+
 
 """
 todo list:
