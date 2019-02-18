@@ -1,3 +1,8 @@
+"""
+file@ kmean.py
+author@ Brian Q, Jian Shen
+date@ Feb 17, 2019
+"""
 from sklearn import metrics
 from sklearn import datasets
 import numpy
@@ -37,7 +42,7 @@ def load_iris(file_name):
         col = rows[i].split(',') # create a list of strings after breaking the given string by ','
         item_features = [] #one list for each item
         # for each column
-        for j in range(1, len(col)-1): # skip first column(id) and last column(name of specie)
+        for j in range(1, len(col) - 1): # skip first column(id) and last column(name of specie)
             val = float(col[j]); #convert values to float, make sure type are not flexible
             item_features.append(val); #add feature value to item list
         dataset.append(item_features);
@@ -56,16 +61,14 @@ def number_of_clusters(dataset):
     best_k = 1;
     #for each k value, calculate silhouette value, choose the maximum silhouette and respective k
     for i in range(2, 11):# test cases where k from 2 to 10
-        centroids, label = kmeans(dataset, i) #retrieve centroids location and labels info
+        centroids, label = kmeans(dataset, i) #retrieve centroids location and label info
         temp_silhouette_value = metrics.silhouette_score(dataset, label) #calculate value here
         print("silhouette coefficient for k = ", i,  " is ", temp_silhouette_value)
         if temp_silhouette_value > max_silhouette_value: #update value if find a larger one
             best_k = i
             max_silhouette_value = temp_silhouette_value
 
-
     print ("best_k is : ", best_k)
-
     return best_k;
 
 
@@ -81,9 +84,9 @@ def kmeans(dataset, k):
 
         #randomlize the value for each feature of centroids
         for i in range(n):
-            min_value = numpy.min(dataset[:,i]) #find minimum value for each column
-            max_value = numpy.max(dataset[:,i]) #find maximum value for each column
-            centroids[:,i] = min_value + (max_value - min_value)* numpy.random.rand(k) #make sure random value is within range
+            min_value = numpy.min(dataset[:, i]) #find minimum value for each column
+            max_value = numpy.max(dataset[:, i]) #find maximum value for each column
+            centroids[:,i] = min_value + (max_value - min_value) * numpy.random.rand(k) #make sure random value is within range
 
         return centroids
 
@@ -104,7 +107,7 @@ def kmeans(dataset, k):
 
             for j in range(k):
                 #step 2:calculate eculidean distance
-                dist = numpy.linalg.norm(dataset[i]-centroids[j])
+                dist = numpy.linalg.norm(dataset[i] - centroids[j])
 
                 #step 3:categorize each point to each nearest mean
                 if dist < min_dist:
@@ -114,89 +117,34 @@ def kmeans(dataset, k):
 
         #step 4:update mean, shift center
         for l in range(k):
-            print("dataset label ==" , l," is ", dataset[label == l], "\n\n")
+            # print("dataset label ==" , l," is ", "\n", dataset[label == l], "\n\n")
             if len(dataset[label == l]) != 0: #dont update centroid if label l cluster is null,
                 centroids[l] = numpy.mean(dataset[label == l])
 
-
         converged = True if (prev_centroids == centroids).all() else False  #check if centroids change
-        print("centroids for k = ", k, centroids, "\n\n\n")
+        # print("centroids for k = ", k, "\n", centroids, "\n\n\n")
 
-    PlotClusters(dataset, label);
     return centroids, label
 
-def CutToTwoFeatures(itemsA, itemsB):
-    n = 3;
-    # n = len(items);
-    X = [];
-    for i in range(n):
-        itemA = itemsA[i];
-        itemB = itemsB[i];
-        newItem = [itemA, itemB];
-        X.append(newItem);
+##create 2d image to plot data
+def PlotClusters(dataset, label, centroids):
+    fig, (ax1,ax2) = pyplot.subplots(1, 2, figsize = (12,5))#use ax1 to plot original data, ax2 to indicate clustering
+    ax1.scatter(dataset[:, 1],dataset[:, 2],c = 'c',marker = 'o')
+    ax2.scatter(dataset[label == 0][:, 1], dataset[label == 0][:, 2], c = 'r') #first column and second column data as parameters,plot first cluster
+    ax2.scatter(dataset[label == 1][:, 1], dataset[label == 1][:, 2], c = 'c')# plot second cluster
+    ax2.scatter(centroids[:, 1], centroids[:, 2], c = 'b', s = 120, marker = 'o')# plot centroids
+    pyplot.show()
 
-    print ("X VALUE/AKA CUT: ", X);
-    return X;
-
-def PlotClusters(dataset, label):
-    cut = CutToTwoFeatures(dataset[label == 0], dataset[label == 1]);
-    n = len(dataset);
-    X = [[] for i in range(n)];
-    print("X FIRST: ", X);
-
-    print("CLUSTERS: ", dataset);
-
-    for i in range(n):
-        data = dataset[i];
-        for item in data:
-                X[i].append(item);
-
-    colors = ['r','b','g','c','m','y'];
-
-    for x in X:
-        print("x: ", x);
-        print ("X: ", X);
-        print ("item: ", item);
-        c = choice(colors);
-        colors.remove(c);
-        Xa = [];
-        Xb = [];
-
-        for item in x:
-            Xa.append(x[0]);
-            Xb.append(x[1]);
-
-        pyplot.plot(Xa,Xb,'o', color=c);
-
-    pyplot.show();
 
 
 #test case
-iris = load_iris("Iris.csv")
-print(iris)
-number_of_clusters(iris)
-# PlotClusters(centroids);
+print("--------------------Iris--------------------\n\n")
+iris = load_iris("Iris.csv") #load iris data from local file
+centroids, label = kmeans(iris, number_of_clusters(iris)) #retrieve attributes from dataset under best k condition
+PlotClusters(iris, label, centroids); #plot data
 
 #test case
-# mushroom = load_mushroom("mushrooms.csv")
-# print(mushroom)
-# number_of_clusters(mushroom)
-# PlotClusters(mushroom);
-
-
-"""
-todo list:
-README: ideas, process, results
-
-Jian:
-read iris dataset
-solve nan problem
-??best k = 2
-
-Brian:
-read mushroom dataset
-plot data
-
-
-
-"""
+print("------------------Mushroom------------------\n\n")
+mushroom = load_mushroom("mushrooms.csv") #load mushroom data from local file
+centroids, label = kmeans(mushroom, number_of_clusters(mushroom)) #retrieve attributes from dataset under best k condition
+PlotClusters(mushroom, label, centroids); #plot data
